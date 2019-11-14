@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # source secret.env before running this program!
-#./hot_playlist.py dangbert 40 "spotify:playlist:40dcGwdCvUDFwS893qdaLd" --backup_uri "spotify:playlist:40dcGwdCvUDFwS893qdaLd"
+# command for testing:
+#   ./hot_playlist.py dangbert 1 "spotify:playlist:40dcGwdCvUDFwS893qdaLd" --backup_uri "spotify:playlist:5RkoGPrfNbgjK0qkJizt1O"
 
 import spotipy
 import spotipy.util as util
@@ -78,14 +79,18 @@ def hot_playlist(sp, username, max_days, playlist_uri, backup_uri=None):
         print("\nNo songs ready to remove!")
     elif input("\nRemove " + str(len(track_ids)) + " songs from playlist '" + results["name"] + "'? (y/n): " ).lower().strip() in ('y','yes'):
         # remove desired tracks:
+        # TODO: fix issue where only 100 songs can be removed at once
         sp.user_playlist_remove_specific_occurrences_of_tracks(username, playlist_id, track_ids)
-        print("Done!")
+        print("Tracks Removed!")
+
+        # add songs in track_ids to backup_uri playlist 
+        if backup_uri != None:
+            backup_id = backup_uri.split(':')[2]
+            # TODO: fix (likely) issue where only 100 songs can be added at once
+            sp.user_playlist_add_tracks(username, backup_id, [obj["uri"] for obj in track_ids])
+            print("Added removed songs to backup playlist '" + sp.user_playlist(username, backup_id)["name"] + "'.")
     else:
         print("Aborting without modifying playlist.")
-
-    if backup_uri != None:
-        pass
-        # TODO: add songs in track_ids to backup_uri playlist 
 
 # returns the json results for all the tracks in a playlist (even if > 100 songs)
 def get_all_playlist_tracks(sp, username, playlist_id):
