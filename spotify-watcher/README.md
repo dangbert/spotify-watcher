@@ -12,6 +12,7 @@ This directory contains code for creating "smart" spotify playlists by running a
 * **live_queue** - simple way for people at a party to queue their own music from their phone.
   * when songs are added to a given (collaborative) playlist, they will be immediately removed and appended to the user's current queue.
 * **reversed_playlist** - new songs added to playlist are automatically moved to the very top of the playlist (bope playlist)
+* (all_spanish automatic set of playlists combiner)
 
 ## Setup:
 * Acquire a Spotify API key from the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
