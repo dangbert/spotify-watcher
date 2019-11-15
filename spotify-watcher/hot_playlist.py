@@ -51,6 +51,7 @@ def main():
 #  https://github.com/plamere/spotipy/blob/master/examples/read_a_playlist.py
 # verifyChanges: if True then script will ask for confirmation before changing the playlist
 def hot_playlist(sp, username, max_days, playlist_uri, backup_uri=None, verifyChanges=True):
+    verbose = verifyChanges # whether to print extra debug info
     playlist_id = playlist_uri.split(':')[2]
     results = get_all_playlist_tracks(sp, username, playlist_id)
     print("playlist length: " + str(len(results['tracks']['items'])))
@@ -68,28 +69,32 @@ def hot_playlist(sp, username, max_days, playlist_uri, backup_uri=None, verifyCh
             delta = relativedelta(now, addDate)
             elapsedDays = (now - (now-delta)).days # (more magic) https://stackoverflow.com/a/43521106
 
-            print("age: ({}y, {}m, {}d), {}h:{}m:{}s \t== {} days \t --- #{} '{}'".format(delta.years, delta.months, delta.days, delta.hours, delta.minutes, delta.seconds, elapsedDays, index, item["track"]["name"]))
+            if verbose:
+                print("age: ({}y, {}m, {}d), {}h:{}m:{}s \t== {} days \t --- #{} '{}'".format(delta.years, delta.months, delta.days, delta.hours, delta.minutes, delta.seconds, elapsedDays, index, item["track"]["name"]))
         else:
             print("dateStr None for song " + item["track"]["name"])
 
         if dateStr == None or elapsedDays >= max_days:
             track_ids.append( { "uri" : item["track"]["id"], "positions": [ int(index)] } )
 
-    print("\n\nsongs to remove:")
-    print(json.dumps(track_ids, indent=4))
+    if verbose:
+        print("\n\nsongs to remove:")
+        print(json.dumps(track_ids, indent=4))
     if len(track_ids) == 0:
-        print("\nNo songs ready to remove!")
+        if verbose:
+            print("\nNo songs ready to remove!")
     elif not verifyChanges or input("\nRemove " + str(len(track_ids)) + " songs from playlist '" + results["name"] + "'? (y/n): " ).lower().strip() in ('y','yes'):
-        # remove desired tracks (only can delete 100 at a time)
         runAgain = len(track_ids) > 100
         track_ids=track_ids[:100] # force length <= 100
-        sp.user_playlist_remove_specific_occurrences_of_tracks(username, playlist_id, track_ids)
 
         # add songs in track_ids to backup_uri playlist (only 100 can be added at once)
         if backup_uri != None:
             backup_id = backup_uri.split(':')[2]
             sp.user_playlist_add_tracks(username, backup_id, [obj["uri"] for obj in track_ids])
-            print("Appended the removed songs to backup playlist '" + sp.user_playlist(username, backup_id)["name"] + "'.")
+            if verbose:
+                print("Appended the removed songs to backup playlist '" + sp.user_playlist(username, backup_id)["name"] + "'.")
+        # now remove desired tracks (only can delete 100 at a time)
+        sp.user_playlist_remove_specific_occurrences_of_tracks(username, playlist_id, track_ids)
 
         if runAgain: # recursively continue deleting the rest of the tracks
             hot_playlist(sp, username, max_days, playlist_uri, backup_uri, False)
@@ -110,27 +115,7 @@ def get_all_playlist_tracks(sp, username, playlist_id):
     #print(json.dumps(results, indent=4))
     return results
 
-# removes the provided list of tracks from the given playlist
-# (even if there are > 100 tracks to remove)
-# track_ids is an array of objects of the form { "uri": "48v4OanMw0bPHUDFssBXoD", "positions": [ 384 ] }
-def remove_playlist_tracks(sp, username, playlist_id, track_ids):
-    # TODO: this logic doesn't work.. (because correcting position indices in (interleaved) songs is a pain...
-    return
-    while len(track_ids) > 0:
-        if len(track_ids) <= 100:
-            sp.user_playlist_remove_specific_occurrences_of_tracks(username, playlist_id, track_ids)
-            track_ids = []
-        else:
-            # remove first 100 tracks in track_ids
-            ##sp.user_playlist_remove_specific_occurrences_of_tracks(username, playlist_id, track_ids[:100])
-            track_ids = track_ids[100:] # (drop first 100 elements)
-            # correct positions values
-            for obj in track_ids:
-                print("FLAG!")
-                print(obj["positions"])
-                #obj["positions"] = obj["positions"] - 100
-
-# returns datetime for the UTC time now (location aware)
+# returns datetime object for the UTC time now (location aware)
 # (can be used for relativedelta calculations)
 def timeNowUTC():
     return datetime.utcnow().replace(tzinfo=pytz.UTC)
