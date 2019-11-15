@@ -11,6 +11,7 @@ This directory contains code for creating "smart" spotify playlists by running a
 * **auto_remove** - Batch auto-remove duplicate songs from a set of playlists.
 * **live_queue** - simple way for people at a party to queue their own music from their phone.
   * when songs are added to a given (collaborative) playlist, they will be immediately removed and appended to the user's current queue.
+  * API doesn't currently support queue operations but it may be possible to make a [hacky solution](https://github.com/spotify/web-api/issues/462#issuecomment-311466159)
 * **reversed_playlist** - new songs added to playlist are automatically moved to the very top of the playlist (bope playlist)
 * (all_spanish automatic set of playlists combiner)
 
