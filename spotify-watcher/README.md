@@ -2,7 +2,7 @@
 This directory contains code for creating "smart" spotify playlists by running a script to monitor desired playlists continously and apply desired changes (after a new song is added for example).
 
 ---
-## Key Features (in progress):
+## Key Features:
 * **hot_playlist.py** - playlist songs that were not added in the last X days are automatically removed (as songs are removed they are also added to a second playlist if desired).
 
 ## Future Features (not finished):
@@ -23,8 +23,9 @@ sudo pip3 install spotipy
 
 ## Example Run:
 ````bash
-# deletes given song at index 1 in playlist
-source secret.env && ./decayingPlaylist.py dangbert 40dcGwdCvUDFwS893qdaLd 6ttsH99vfvkAPF3s1tIPqB,1
+source secret.env
+# deletes songs that have been in given playlist for over 14 days (and adds them to the backup playlist)
+./hot_playlist.py dangbert 14 "spotify:playlist:40dcGwdCvUDFwS893qdaLe" --backup_uri spotify:playlist:5RkoGPrfNbgjK0qkJizt1O
 ````
 
 ---
