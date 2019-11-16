@@ -20,7 +20,7 @@ import pytz
 
 def main():
     # parse args
-    parser = argparse.ArgumentParser(description='Removes all songs from given playlist older than max_age days then exits.')
+    parser = argparse.ArgumentParser(description='Removes all songs from given playlist older than max_age days then exits.  (Prompts confirmation before removal).')
     # TODO: look for way to get username from the playlist_uri?
     parser.add_argument('username', type=str, help='(string) username of spotify account owning the playlist.')
     parser.add_argument('max_days', type=int, help='(int) max number of days a song can be in the playlist before removal.')
@@ -41,6 +41,7 @@ def main():
     sp = spotipy.Spotify(auth=token)
     sp.trace = False
 
+    print("Running: " + str(datetime.today()) + "\n")
     # modify playlist
     hot_playlist(sp, args.username, args.max_days, args.playlist_uri, args.backup_uri)
 
@@ -54,7 +55,10 @@ def hot_playlist(sp, username, max_days, playlist_uri, backup_uri=None, verifyCh
     verbose = verifyChanges # whether to print extra debug info
     playlist_id = playlist_uri.split(':')[2]
     results = get_all_playlist_tracks(sp, username, playlist_id)
-    print("playlist length: " + str(len(results['tracks']['items'])))
+    backup_id = None if (backup_uri == None) else backup_uri.split(':')[2]
+    if verbose:
+        print("playlist length: " + str(len(results['tracks']['items'])))
+        print("(songs marked for deletion with 'X'):")
 
     now = timeNowUTC()
     track_ids = []
@@ -62,34 +66,38 @@ def hot_playlist(sp, username, max_days, playlist_uri, backup_uri=None, verifyCh
     for index, item in enumerate(results["tracks"]["items"]):
         # calculate the time elapsed since track was added to playlist
         dateStr = item["added_at"] # e.g. "2019-11-12T04:21:15Z"
-        if dateStr != None: # "added_at" can be null for very old playlists
+        if dateStr != None:        # "added_at" can be null for very old playlists
             addDate = parser.parse(dateStr) # magic date parser
 
             # get the delta time since playlist was added
             delta = relativedelta(now, addDate)
             elapsedDays = (now - (now-delta)).days # (more magic) https://stackoverflow.com/a/43521106
 
-            if verbose:
-                print("age: ({}y, {}m, {}d), {}h:{}m:{}s \t== {} days \t --- #{} '{}'".format(delta.years, delta.months, delta.days, delta.hours, delta.minutes, delta.seconds, elapsedDays, index, item["track"]["name"]))
         else:
             print("dateStr None for song " + item["track"]["name"])
 
         if dateStr == None or elapsedDays >= max_days:
+            if verbose:
+                print("X\tage: ({}y, {}m, {}d), {}h:{}m:{}s \t== {} days \t --- #{} '{}'".format(delta.years, delta.months, delta.days, delta.hours, delta.minutes, delta.seconds, elapsedDays, index, item["track"]["name"]))
             track_ids.append( { "uri" : item["track"]["id"], "positions": [ int(index)] } )
+        else:
+            print("\tage: ({}y, {}m, {}d), {}h:{}m:{}s \t== {} days \t --- #{} '{}'".format(delta.years, delta.months, delta.days, delta.hours, delta.minutes, delta.seconds, elapsedDays, index, item["track"]["name"]))
 
-    if verbose:
-        print("\n\nsongs to remove:")
-        print(json.dumps(track_ids, indent=4))
     if len(track_ids) == 0:
         if verbose:
-            print("\nNo songs ready to remove!")
-    elif not verifyChanges or input("\nRemove " + str(len(track_ids)) + " songs from playlist '" + results["name"] + "'? (y/n): " ).lower().strip() in ('y','yes'):
+            print("\n--------------\nNo songs ready to remove!")
+        return
+    if verbose:
+        print("\n--------------")
+        if backup_id != None:
+            print("* removed songs will be added to the playlist: '" + sp.user_playlist(username, backup_id)["name"] + "'")
+        print("* after removal " + str(len(results["tracks"]["items"]) - len(track_ids)) + " song(s) will remain in playlist '" + results["name"] + "'")
+    if not verifyChanges or input("\nRemove " + str(len(track_ids)) + " songs from playlist '" + results["name"] + "'? (y/n): " ).lower().strip() in ('y','yes'):
         runAgain = len(track_ids) > 100
         track_ids=track_ids[:100] # force length <= 100
 
         # add songs in track_ids to backup_uri playlist (only 100 can be added at once)
         if backup_uri != None:
-            backup_id = backup_uri.split(':')[2]
             sp.user_playlist_add_tracks(username, backup_id, [obj["uri"] for obj in track_ids])
             if verbose:
                 print("Appended the removed songs to backup playlist '" + sp.user_playlist(username, backup_id)["name"] + "'.")
