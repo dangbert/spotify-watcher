@@ -19,7 +19,7 @@ This directory contains code for creating "smart" spotify playlists by running a
 * Acquire a Spotify API key from the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
 * Install dependency [spotipy](https://github.com/plamere/spotipy)
 ````bash
-sudo pip3 install spotipy
+pip3 install spotipy python-dateutil pytz --user
 ```
 
 ## Example Run:
@@ -27,8 +27,7 @@ sudo pip3 install spotipy
 source secret.env
 # deletes songs that have been in given playlist for over 14 days (and adds them to the backup playlist)
 ./hot_playlist.py dangbert 14 "spotify:playlist:40dcGwdCvUDFwS893qdaLe" --backup_uri spotify:playlist:5RkoGPrfNbgjK0qkJizt1O
-````
-
+```` 
 ---
 ## Resources:
 * [spotipy documentation](https://spotipy.readthedocs.io/en/latest/)
