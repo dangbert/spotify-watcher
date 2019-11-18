@@ -58,30 +58,19 @@ def remove_duplicates(sp, username, playlist_uri, keepOldest=True, verbose=True)
     #print(json.dumps(results, indent=4))
 
     # search for duplicate songs
-    deleteMap = {}     # maps track ids to list of indices of all duplicate occurences
+    dupMap = {}     # maps track ids to list of indices of their occurences
     for index, item in enumerate(results["tracks"]["items"]):
-        # if we have already labeled this song as a duplicate then continue
-        if item['track']['id'] in deleteMap and index in deleteMap[item['track']['id']]:
-            continue
-
-        # compare to rest of items in playlist
-        for index2, item2 in enumerate(results["tracks"]["items"]):
-            if index == index2:
-                continue
-            if item['track']['id'] == item2['track']['id']: # duplicates
-                if not item['track']['id'] in deleteMap:
-                    deleteMap[item['track']['id']] = []
-                arr = deleteMap[item['track']['id']]
-                if not index in arr:
-                    arr.append(index)
-                if not index2 in arr:
-                    arr.append(index2)
+        if not item['track']['id'] in dupMap:
+            dupMap[item['track']['id']] = []
+        dupMap[item['track']['id']].append(index)
 
     # for each set of duplicates, pick the song that is oldest/newest to the playlist to keep (based on keepOldest)
     deleteList = []  # indices to remove
     protectList = [] # indices to protect (don't delete even if its in deleteList)
-    for track_id in deleteMap:
-        arr = deleteMap[track_id] # list of indices of duplicate songs of track_id
+    for track_id in dupMap:
+        arr = dupMap[track_id] # list of indices of duplicate songs of track_id
+        if len(arr) <= 1:      # no duplicates of this song
+            continue
         deleteList.extend(arr)
         # now put one song in protectList (the version of this duplicate to keep)
         ageList = [0 for x in arr]
