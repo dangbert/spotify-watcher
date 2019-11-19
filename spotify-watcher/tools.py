@@ -85,7 +85,6 @@ def remove_duplicates(sp, username, playlist_uri, keepOldest=True, verbose=True)
 #   https://github.com/plamere/spotipy/blob/master/examples/show_artist_top_tracks.py
 #   https://spotipy.readthedocs.io/en/latest/#spotipy.client.Spotify.user_playlist_add_tracks
 # create new playlist if dest_playlist_uri is ""
-# TODO: delete duplicates afterwards as well (using delete_after)
 ##########################################################
 def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=False):
     if dest_uri == "":
@@ -98,47 +97,38 @@ def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=Fa
 
     visitedArtists = {} # uri's of artists already "visited" to find their top songs
     track_ids = [] # ids of tracks to add to dest playlist
-    positions = [] # position to insert each track in
 
     # traverse songs (backwards so songs at bottom of source playlist --> songs at top of dest playlist)
     for index, item in enumerate(reversed(results["tracks"]["items"])):
-        print(index)
-        length = len(list(item["track"]["artists"]))
-        check = True if length > 3 else False
-        if check:
-            print("good example track:")
-            print("length = " + str(length))
-            print(json.dumps(item["track"]["artists"], indent=4))
-            print("--->")
-
+        # TODO: set limit for number of artists to consider from a single song??
+        #       (or at least on the max number of songs to be added bc of that single song)
         for artist in item["track"]["artists"]:
             if artist["uri"] in visitedArtists:
                 continue
-            if check:
-                # get list of "Popular" songs from the artist
-                top_response = sp.artist_top_tracks(artist["uri"])
-                #print(json.dumps(top_response, indent=4))
-                for popIndex, popItem in enumerate(top_response["tracks"]):
-                    if popIndex >= copy_num:
-                        break
-                    #print(json.dumps(popItem, indent=4))
+
+            # get list of "Popular" songs from the artist
+            top_response = sp.artist_top_tracks(artist["uri"])
+            #print(json.dumps(top_response, indent=4))
+            for popIndex, popItem in enumerate(top_response["tracks"]):
+                if popIndex < copy_num:
                     track_ids.append(popItem["id"])
-                    # TODO: what position do we want...
-                    positions.append([0])
-                visitedArtists[artist["uri"]] = True
-                print("\n\ntrack_ids:")
-                print(track_ids)
-                print("\npositions")
-                print(positions)
-                # note: if all positions are set to [0] then tracks track_ids[0] will end up at
-                #       index 0 in playlist, track_ids[1] at index 1, etc...
-                sp.user_playlist_add_tracks(username, dest_id, track_ids, positions)
+            visitedArtists[artist["uri"]] = True
 
-                exit(0)
-    # TODO: consider auto-removing songs from the output list X (10) days after they are listened to (if I can see that)
-    # TODO: add new songs to the top of this playlist...
-    pass
+    print("\n\nnum track_ids: " + str(len(track_ids)))
 
+    #track_ids = [y for y in range(201)] # TODO: for practice
+    #print("practicing on:\n" + str(track_ids))
+    # handle when > 100 songs are to be added (and ensure track_id[0] ends at top of the playlist):
+    while len(track_ids) > 0:
+        if len(track_ids) > 100:
+            tmp = track_ids[len(track_ids)-100:len(track_ids)]
+            track_ids = track_ids[0:len(track_ids)-100]
+        else:
+            tmp = track_ids
+            track_ids = []
+        sp.user_playlist_add_tracks(username, dest_id, tmp, [[0] for x in tmp])
+    # remove duplicates from dest playlist
+    remove_duplicates(sp, username, dest_uri, keepOldest=True, verbose=False)
 
 ##########################################################
 # remove all songs older than max_days from given playlist:

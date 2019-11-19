@@ -9,6 +9,7 @@ This directory contains code for creating "smart" spotify playlists by running a
 ## Future Features (not finished):
 * **cool_artists.py** - tool for conveniently exploring later a cool artist that you just found.
   * When a new song is added to a given playlist, it will automatically be removed and the top X songs by that artists will automatically be appended to a second playlist of "cool artists".
+* **recently_liked** - playlist that automatically gets populated with all the songs you liked within the last X days (older songs are dropped automatically).  Useful for liking a song in the car and then adding it to a playlist later when you're not driving...
 * **live_queue** - simple way for people at a party to queue their own music from their phone.
   * when songs are added to a given (collaborative) playlist, they will be immediately removed and appended to the user's current queue.
   * API doesn't currently support queue operations but it may be possible to make a [hacky solution](https://github.com/spotify/web-api/issues/462#issuecomment-311466159)
@@ -30,6 +31,8 @@ source secret.env
 
 # remove duplicate songs within playlist
 ./remove_duplicates.py dangbert spotify:playlist:2oFKMf27QZ3CdpySwD9dKz
+
+./cool_artists.py dangbert spotify:playlist:1PmfiGD4xvNSbEnFFgx7kk spotify:playlist:i72oGPrfNbgjK0qkJiz32f --copy_num 3
 ```` 
 ---
 ## Resources:

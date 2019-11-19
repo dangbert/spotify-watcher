@@ -29,9 +29,8 @@ def main():
     parser.add_argument('source_playlist_uri', type=str, help='(string) uri of spotify playlist to source names of artists from (e.g. "spotify:playlist:i0dcGw2CvUDFwx833UdaLf"')
     # (args starting with '--' are made optional)
     parser.add_argument('dest_playlist_uri', type=str, help='(string) uri of spotify playlist to add the top songs to by the artists found in the source playlist OR set to "" to create a new playlist')
-    parser.add_argument('--delete_after', type=bool, default='false', help='(optional bool) set "true" to delete songs in the source playlist as well. (default "false")')
+    parser.add_argument('--delete_after', type=str, default='false', help='(optional bool) set "true" to delete songs in the source playlist as well. (default "false")')
     parser.add_argument('--copy_num', type=int, default=3, help='(optional int) max number of top songs to add from each artist (default 3)')
-    #parser.add_argument('--delete_after', type=str, default='true', help='(optional bool) set "false" to prevent deletion of songs in source playlist (default true)')
     args = parser.parse_args()
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
