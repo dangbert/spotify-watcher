@@ -5,7 +5,7 @@
 
 import spotipy
 import spotipy.util as util
-#from spotipy.oauth2 import SpotifyClientCredentials
+from tools import cool_artists
 
 import pprint
 import json
@@ -29,12 +29,18 @@ def main():
     parser.add_argument('source_playlist_uri', type=str, help='(string) uri of spotify playlist to source names of artists from (e.g. "spotify:playlist:i0dcGw2CvUDFwx833UdaLf"')
     # (args starting with '--' are made optional)
     parser.add_argument('dest_playlist_uri', type=str, help='(string) uri of spotify playlist to add the top songs to by the artists found in the source playlist OR set to "" to create a new playlist')
-    parser.add_argument('--delete_after', type=bool, default=True, help='(optional bool) set "false" to not modify the source playlist, set "true" to empty the source playlist afterwards (default "true")')
-    parser.add_argument('--song_count', type=int, default=3, help='(optional int) number of top songs to get from each artist (default 3)')
+    parser.add_argument('--delete_after', type=bool, default='false', help='(optional bool) set "true" to delete songs in the source playlist as well. (default "false")')
+    parser.add_argument('--copy_num', type=int, default=3, help='(optional int) max number of top songs to add from each artist (default 3)')
+    #parser.add_argument('--delete_after', type=str, default='true', help='(optional bool) set "false" to prevent deletion of songs in source playlist (default true)')
     args = parser.parse_args()
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         exit(1)
+    args.delete_after = args.delete_after.lower()
+    if args.delete_after not in ["true", "false"]:
+        print("ERROR: argument for --delete_after must be 'true' or 'false'")
+        exit(1)
+    args.delete_after = True if args.delete_after == "true" else False
 
     # setup API
     scope = 'playlist-modify-public'
@@ -47,15 +53,8 @@ def main():
 
     # modify playlist
     print("Running cool_artists: " + str(datetime.today()) + "\n")
-    cool_artists(sp, args.username, args.source_playlist_uri, args.dest_playlist_uri, args.song_count)
+    cool_artists(sp, args.username, args.source_playlist_uri, args.dest_playlist_uri, args.copy_num, args.delete_after)
 
-
-# TODO: easy to make based on:
-#   https://github.com/plamere/spotipy/blob/master/examples/show_artist_top_tracks.py
-# create new playlist if dest_playlist_uri is ""
-# TODO: delete duplicates afterwards as well...
-def cool_artists(sp, username, source_playlist_uri, dest_playlist_uri, delete_after=True, song_count=3):
-    pass
 
 if __name__ == "__main__":
     main()

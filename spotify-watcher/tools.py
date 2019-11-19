@@ -80,6 +80,64 @@ def remove_duplicates(sp, username, playlist_uri, keepOldest=True, verbose=True)
     else:
         print("Aborting without modifying playlist.")
 
+##########################################################
+# based on:
+#   https://github.com/plamere/spotipy/blob/master/examples/show_artist_top_tracks.py
+#   https://spotipy.readthedocs.io/en/latest/#spotipy.client.Spotify.user_playlist_add_tracks
+# create new playlist if dest_playlist_uri is ""
+# TODO: delete duplicates afterwards as well (using delete_after)
+##########################################################
+def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=False):
+    if dest_uri == "":
+        # TODO: create new playlist for user
+        pass
+    source_id = source_uri.split(':')[2]
+    dest_id = dest_uri.split(':')[2]
+    results = get_all_playlist_tracks(sp, username, source_id)
+    #print(json.dumps(results, indent=4))
+
+    visitedArtists = {} # uri's of artists already "visited" to find their top songs
+    track_ids = [] # ids of tracks to add to dest playlist
+    positions = [] # position to insert each track in
+
+    # traverse songs (backwards so songs at bottom of source playlist --> songs at top of dest playlist)
+    for index, item in enumerate(reversed(results["tracks"]["items"])):
+        print(index)
+        length = len(list(item["track"]["artists"]))
+        check = True if length > 3 else False
+        if check:
+            print("good example track:")
+            print("length = " + str(length))
+            print(json.dumps(item["track"]["artists"], indent=4))
+            print("--->")
+
+        for artist in item["track"]["artists"]:
+            if artist["uri"] in visitedArtists:
+                continue
+            if check:
+                # get list of "Popular" songs from the artist
+                top_response = sp.artist_top_tracks(artist["uri"])
+                #print(json.dumps(top_response, indent=4))
+                for popIndex, popItem in enumerate(top_response["tracks"]):
+                    if popIndex >= copy_num:
+                        break
+                    #print(json.dumps(popItem, indent=4))
+                    track_ids.append(popItem["id"])
+                    # TODO: what position do we want...
+                    positions.append([0])
+                visitedArtists[artist["uri"]] = True
+                print("\n\ntrack_ids:")
+                print(track_ids)
+                print("\npositions")
+                print(positions)
+                # note: if all positions are set to [0] then tracks track_ids[0] will end up at
+                #       index 0 in playlist, track_ids[1] at index 1, etc...
+                sp.user_playlist_add_tracks(username, dest_id, track_ids, positions)
+
+                exit(0)
+    # TODO: consider auto-removing songs from the output list X (10) days after they are listened to (if I can see that)
+    # TODO: add new songs to the top of this playlist...
+    pass
 
 
 ##########################################################
