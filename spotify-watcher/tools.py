@@ -131,7 +131,7 @@ def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=Fa
     # remove duplicates from dest playlist
     remove_duplicates(sp, username, dest_uri, keepOldest=True, verbose=False)
     # clear all songs in the source playlist
-    if deleteAfter:
+    if delete_after:
         remove_all_playlist_tracks(sp, username, source_uri)
 
 ##########################################################
