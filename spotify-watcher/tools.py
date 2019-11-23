@@ -81,23 +81,23 @@ def remove_duplicates(sp, username, playlist_uri, keepOldest=True, verbose=True)
         print("Aborting without modifying playlist.")
 
 ##########################################################
+# note that you can run this on a playlist you don't own too :)
 # based on:
 #   https://github.com/plamere/spotipy/blob/master/examples/show_artist_top_tracks.py
 #   https://spotipy.readthedocs.io/en/latest/#spotipy.client.Spotify.user_playlist_add_tracks
 # create new playlist if dest_playlist_uri is ""
 ##########################################################
 def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=False):
-    if dest_uri == "":
-        # TODO: create new playlist for user
-        pass
     source_id = source_uri.split(':')[2]
-    dest_id = dest_uri.split(':')[2]
     results = get_all_playlist_tracks(sp, username, source_id)
     #print(json.dumps(results, indent=4))
+    if dest_uri == "":
+        # create new playlist for user
+        dest_uri = create_playlist(sp, username, "cool artists -- " + results["name"] + "", public=True)
+    dest_id = dest_uri.split(':')[2]
 
     visitedArtists = {} # uri's of artists already "visited" to find their top songs
     track_ids = [] # ids of tracks to add to dest playlist
-
     # traverse songs (backwards so songs at bottom of source playlist --> songs at top of dest playlist)
     for index, item in enumerate(reversed(results["tracks"]["items"])):
         track_ids.append(item["track"]["id"]) # also copy the original song
@@ -118,8 +118,6 @@ def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=Fa
 
     print("\n\nnum track_ids: " + str(len(track_ids)))
 
-    #track_ids = [y for y in range(201)] # TODO: for practice
-    #print("practicing on:\n" + str(track_ids))
     # handle when > 100 songs are to be added (and ensure track_id[0] ends at top of the playlist):
     while len(track_ids) > 0:
         if len(track_ids) > 100:
@@ -224,6 +222,18 @@ def get_all_playlist_tracks(sp, username, playlist_id):
         results['tracks']['next'] = tmpResults['next'] # update next value
     #print(json.dumps(results, indent=4))
     return results
+
+# creates playlist for user with desired name
+# returns the URI of the new playlist
+# note: that playlists will the same name are allowed by spotify
+def create_playlist(sp, username, name, public=True):
+    print('in create_playlist')
+    nyc = datetime.now(pytz.timezone('US/Eastern')) # NYC time
+    description = str(nyc.strftime("Created %d, %b %Y at %H:%m" ))
+    # description field doesn't work and this didn't help:
+    #   https://github.com/plamere/spotipy/issues/211#issuecomment-369863112
+    ret = sp.user_playlist_create(username, name, public=public) #, description)
+    return ret["uri"]
 
 # returns datetime object for the UTC time now (location aware)
 # (can be used for relativedelta calculations)

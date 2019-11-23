@@ -17,10 +17,14 @@ source secret.env
 ```` 
 
 * **cool_artists.py** - tool for conveniently exploring later a cool artist that you just found.
+  * Run this on any public playlist and it will copy the songs inside + other top songs by each artist into a new playlist (or into the specified output playlist).
   * When a new song is added to a given playlist, it will automatically be removed and the top X songs by that artists will automatically be appended to a second playlist of "cool artists".
+
 ````bash
 source secret.env
 ./cool_artists.py dangbert spotify:playlist:2oFKMf27QZ3CdpySwD9dKz spotify:playlist:5RkoGPrfNbgjK0qkJizt1O --copy_num 3 --delete_after True
+# (if you leave the dest_playlist_uri empty it will automatically create a new playlist)
+./cool_artists.py dangbert spotify:playlist:37i9dQZF1DX4V5eXk4NKqu "" --copy_num 2
 ````
 
 ## Future Features (not finished):
