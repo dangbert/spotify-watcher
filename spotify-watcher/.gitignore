@@ -1,2 +1,5 @@
+__pycache__/
 secret.env
+playlists.env
 .cache-*
+log--*
