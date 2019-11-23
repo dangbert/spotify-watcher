@@ -100,9 +100,10 @@ def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=Fa
 
     # traverse songs (backwards so songs at bottom of source playlist --> songs at top of dest playlist)
     for index, item in enumerate(reversed(results["tracks"]["items"])):
-        # TODO: set limit for number of artists to consider from a single song??
-        #       (or at least on the max number of songs to be added bc of that single song)
+        track_ids.append(item["track"]["id"]) # also copy the original song
+        # add tracks from every artist of the song
         for artist in item["track"]["artists"]:
+            numCopied = 0
             if artist["uri"] in visitedArtists:
                 continue
 
@@ -110,7 +111,8 @@ def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=Fa
             top_response = sp.artist_top_tracks(artist["uri"])
             #print(json.dumps(top_response, indent=4))
             for popIndex, popItem in enumerate(top_response["tracks"]):
-                if popIndex < copy_num:
+                if numCopied < copy_num and popItem["id"] != item["track"]["id"]:
+                    numCopied += 1
                     track_ids.append(popItem["id"])
             visitedArtists[artist["uri"]] = True
 

@@ -30,7 +30,7 @@ def main():
     # (args starting with '--' are made optional)
     parser.add_argument('dest_playlist_uri', type=str, help='(string) uri of spotify playlist to add the top songs to by the artists found in the source playlist OR set to "" to create a new playlist')
     parser.add_argument('--delete_after', type=str, default='false', help='(optional bool) set "true" to delete songs in the source playlist as well. (default "false")')
-    parser.add_argument('--copy_num', type=int, default=3, help='(optional int) max number of top songs to add from each artist (default 3)')
+    parser.add_argument('--copy_num', type=int, default=3, help='(optional int) max number of top songs to add from each artist in addition to the initial source song (default 3)')
     args = parser.parse_args()
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -51,7 +51,7 @@ def main():
     sp.trace = False
 
     # modify playlist
-    print("Running cool_artists: " + str(datetime.today()) + "\n")
+    print("\nRunning cool_artists: " + str(datetime.today()) + "\n")
     cool_artists(sp, args.username, args.source_playlist_uri, args.dest_playlist_uri, args.copy_num, args.delete_after)
 
 

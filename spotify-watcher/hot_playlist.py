@@ -40,7 +40,7 @@ def main():
     sp = spotipy.Spotify(auth=token)
     sp.trace = False
 
-    print("Running hot_playlist: " + str(datetime.today()) + "\n")
+    print("\nRunning hot_playlist: " + str(datetime.today()) + "\n")
     # modify playlist
     hot_playlist(sp, args.username, args.max_days, args.playlist_uri, args.backup_uri)
 
