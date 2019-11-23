@@ -24,7 +24,7 @@ import pytz
 def main():
     # parse args
     parser = argparse.ArgumentParser(description='Gets the top songs of each unique artist in source playlist and adds them to the dest playlist.')
-    # TODO: look for way to get username from the playlist_uri?
+    # TODO: add option to select whether to put songs at top or bottom of playlist...
     parser.add_argument('username', type=str, help='(string) username of spotify account owning the playlist.')
     parser.add_argument('source_playlist_uri', type=str, help='(string) uri of spotify playlist to source names of artists from (e.g. "spotify:playlist:i0dcGw2CvUDFwx833UdaLf"')
     # (args starting with '--' are made optional)

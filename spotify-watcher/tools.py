@@ -127,8 +127,12 @@ def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=Fa
             tmp = track_ids
             track_ids = []
         sp.user_playlist_add_tracks(username, dest_id, tmp, [[0] for x in tmp])
+
     # remove duplicates from dest playlist
     remove_duplicates(sp, username, dest_uri, keepOldest=True, verbose=False)
+    # clear all songs in the source playlist
+    if deleteAfter:
+        remove_all_playlist_tracks(sp, username, source_uri)
 
 ##########################################################
 # remove all songs older than max_days from given playlist:
@@ -199,6 +203,11 @@ def hot_playlist(sp, username, max_days, playlist_uri, backup_uri=None, verifyCh
             hot_playlist(sp, username, max_days, playlist_uri, backup_uri, False)
     else:
         print("Aborting without modifying playlist.")
+
+# remove all songs in a given playlist
+def remove_all_playlist_tracks(sp, username, playlist_uri):
+    # remove all songs that have been in the playlist for longer than 0 days
+    hot_playlist(sp, username, 0, playlist_uri, backup_uri=None, verifyChanges=False)
 
 # returns the json results for all the tracks in a playlist (even if > 100 songs)
 def get_all_playlist_tracks(sp, username, playlist_id):
