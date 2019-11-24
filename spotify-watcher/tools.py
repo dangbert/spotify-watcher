@@ -93,7 +93,7 @@ def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=Fa
     #print(json.dumps(results, indent=4))
     if dest_uri == "":
         # create new playlist for user
-        dest_uri = create_playlist(sp, username, "cool artists -- " + results["name"] + "", public=True)
+        dest_uri = create_playlist(sp, username, results["name"] + " -- extended", public=True)
     dest_id = dest_uri.split(':')[2]
 
     visitedArtists = {} # uri's of artists already "visited" to find their top songs
