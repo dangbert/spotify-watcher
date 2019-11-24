@@ -91,9 +91,10 @@ def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=Fa
     source_id = source_uri.split(':')[2]
     results = get_all_playlist_tracks(sp, username, source_id)
     #print(json.dumps(results, indent=4))
-    if dest_uri == "":
-        # create new playlist for user
-        dest_uri = create_playlist(sp, username, results["name"] + " -- extended", public=True)
+    if dest_uri == "": # create new playlist for user
+        pname = results["name"] + " -- extended" # playlist name
+        dest_uri = create_playlist(sp, username, pname, public=True)
+        print("created playlist: '" + pname + "'\t" + str(dest_uri))
     dest_id = dest_uri.split(':')[2]
 
     visitedArtists = {} # uri's of artists already "visited" to find their top songs
@@ -227,7 +228,6 @@ def get_all_playlist_tracks(sp, username, playlist_id):
 # returns the URI of the new playlist
 # note: that playlists will the same name are allowed by spotify
 def create_playlist(sp, username, name, public=True):
-    print('in create_playlist')
     nyc = datetime.now(pytz.timezone('US/Eastern')) # NYC time
     description = str(nyc.strftime("Created %d, %b %Y at %H:%m" ))
     # description field doesn't work and this didn't help:
