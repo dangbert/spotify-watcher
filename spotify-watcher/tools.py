@@ -19,6 +19,15 @@ import pytz
 # removes all duplicate songs in the given Spotify playlist
 # keepOldest: (bool) set false to preserve the duplicate that was most recently added to the playlist instead of the oldest
 ##########################################################
+def live_queue(sp, username):
+    # https://spotipy.readthedocs.io/en/latest/#spotipy.client.Spotify.start_playback
+    # https://developer.spotify.com/documentation/web-api/reference/player/start-a-users-playback/ (see uris section)
+    pass
+
+##########################################################
+# removes all duplicate songs in the given Spotify playlist
+# keepOldest: (bool) set false to preserve the duplicate that was most recently added to the playlist instead of the oldest
+##########################################################
 def remove_duplicates(sp, username, playlist_uri, keepOldest=True, verbose=True):
     if verbose:
         print("Running remove_duplicates: " + str(datetime.today()) + "\n")
@@ -205,6 +214,8 @@ def hot_playlist(sp, username, max_days, playlist_uri, backup_uri=None, verifyCh
     else:
         print("Aborting without modifying playlist.")
 
+
+# TODO: consider placing base-functionality level tools in a separate file
 # remove all songs in a given playlist
 def remove_all_playlist_tracks(sp, username, playlist_uri):
     # remove all songs that have been in the playlist for longer than 0 days
