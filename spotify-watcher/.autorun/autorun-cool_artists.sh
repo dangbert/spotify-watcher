@@ -5,7 +5,7 @@
 #30 * * * * /home/pi/Downloads/RUN/misc-tools/spotify-watcher/autorun-cool_artists.sh
 #45 * * * * /home/pi/Downloads/RUN/misc-tools/spotify-watcher/autorun-cool_artists.sh
 
-NUM_COPY=4
+NUM_COPY=3
 
 BASE="/home/pi/Downloads/misc-tools/spotify-watcher/.autorun"
 cd "$BASE"

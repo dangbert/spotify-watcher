@@ -17,6 +17,9 @@ from dateutil.relativedelta import *
 from datetime import datetime
 import pytz
 
+# TODO: this fails for the Rap Caviar playlist:
+#  ./cool_artists.py dangbert spotify:playlist:37i9dQZF1DX0XUsuxWHRQd ""
+# TODO: only pulled 2 songs from "cool artists" for input song spotify:track:24ovEYWV3PjlLOSsmNEWQv
 
 # TODO: consider putting this online (with a dumb simple UI)
 #   user chooses source playlist from dropdown of their playlists or enters the URI
@@ -43,6 +46,8 @@ def main():
 
     # setup API
     scope = 'playlist-modify-public'
+    # TODO: note that this^ won't work for modifying a user's private playlists
+    # https://developer.spotify.com/documentation/general/guides/scopes/#playlist-modify-private
     token = util.prompt_for_user_token(args.username, scope)
     if not token:
         print("Can't get Spotify API token for", args.username)

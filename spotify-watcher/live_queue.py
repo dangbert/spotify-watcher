@@ -2,6 +2,10 @@
 # source secret.env before running this program!
 # command for testing:
 #   ./cool_artists.py dangbert spotify:playlist:5RkoGPrfNbgjK0qkJizt1O ""
+#
+# name this one: "somone is always the DJ"
+# whenever people want to use it, they log into my site and enable it (by giving permissions and also pressing a button)
+# then one of their playlists will be "activated" to make it
 
 import spotipy
 import spotipy.util as util

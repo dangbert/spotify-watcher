@@ -96,6 +96,7 @@ def remove_duplicates(sp, username, playlist_uri, keepOldest=True, verbose=True)
 #   https://spotipy.readthedocs.io/en/latest/#spotipy.client.Spotify.user_playlist_add_tracks
 # create new playlist if dest_playlist_uri is ""
 ##########################################################
+# TODO: put new songs at bottom of playlist instead of top... (from now on)
 def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=False):
     source_id = source_uri.split(':')[2]
     results = get_all_playlist_tracks(sp, username, source_id)
