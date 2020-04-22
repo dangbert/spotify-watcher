@@ -129,6 +129,10 @@ def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=Fa
 
     print("\n\nnum track_ids: " + str(len(track_ids)))
 
+
+    # TODO: make a parameter to decide whether to insert at top or bottom
+    # (set insertPos to 0 and never update it below to insert tracks at the top of the playlist instead of the bottom)
+    insertPos = len(get_all_playlist_tracks(sp, username, dest_id)["tracks"]["items"])
     # handle when > 100 songs are to be added (and ensure track_id[0] ends at top of the playlist):
     while len(track_ids) > 0:
         if len(track_ids) > 100:
@@ -137,7 +141,8 @@ def cool_artists(sp, username, source_uri, dest_uri, copy_num=3, delete_after=Fa
         else:
             tmp = track_ids
             track_ids = []
-        sp.user_playlist_add_tracks(username, dest_id, tmp, [[0] for x in tmp])
+        sp.user_playlist_add_tracks(username, dest_id, tmp, [[insertPos] for x in tmp])
+        insertPos += len(tmp)
 
     # remove duplicates from dest playlist
     remove_duplicates(sp, username, dest_uri, keepOldest=True, verbose=False)
