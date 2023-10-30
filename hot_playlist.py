@@ -32,7 +32,7 @@ def main():
         exit(1)
 
     # setup API
-    scope = 'playlist-modify-public'
+    scope = 'playlist-modify-public playlist-modify-private'
     token = util.prompt_for_user_token(args.username, scope)
     if not token:
         print("Can't get Spotify API token for", args.username)

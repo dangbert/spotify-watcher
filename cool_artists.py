@@ -45,7 +45,7 @@ def main():
     args.delete_after = True if args.delete_after == "true" else False
 
     # setup API
-    scope = 'playlist-modify-public'
+    scope = 'playlist-modify-public playlist-modify-private'
     # TODO: note that this^ won't work for modifying a user's private playlists
     # https://developer.spotify.com/documentation/general/guides/scopes/#playlist-modify-private
     token = util.prompt_for_user_token(args.username, scope)

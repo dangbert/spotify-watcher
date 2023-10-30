@@ -42,6 +42,10 @@ source secret.env
 pip3 install spotipy python-dateutil pytz --user
 ````
 
+### Get auth key:
+
+Run cool_artists.py or host_playlists.py (manually) and enter the URL redirected to.  A file `.cache-<SPOTIFY_USERNAME>` will be written to disk (and can be transferred to other servers running the script).
+
 ---
 ## Resources:
 * [spotipy documentation](https://spotipy.readthedocs.io/en/latest/)
